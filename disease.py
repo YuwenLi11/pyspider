@@ -36,12 +36,10 @@ class Handler(BaseHandler):
             self.crawl(each.attr.href, callback=self.disease_page)
     
     def disease_page(self, response):
-        for each in response.doc('dd > a').items():
+        for each in response.doc('div.chapter:nth-last-of-type(n + 3) a').items():
             if each.hasClass('nodata') != 1:
                 self.crawl(each.attr.href, callback=self.detail_page)
-            
-    
-    @config(priority=2)
+
     def detail_page(self, response):
         for each in response.doc('.dis_link a').items():
             self.crawl(each.attr.href, callback=self.moreinfo_page)
@@ -51,7 +49,7 @@ class Handler(BaseHandler):
                 "url": response.url,
                 "detail": response.doc('.skin_knw .bd').text()
             }
-        
+
     def moreinfo_page(self, response):
         return {
             "url": response.url,
