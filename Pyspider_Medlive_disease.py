@@ -17,7 +17,7 @@ class Handler(BaseHandler):
         db = pymysql.connect(host="localhost", user="root", password="", db="Disease", charset="utf8")
         try:
             cursor = db.cursor()
-            sql = 'INSERT INTO links_domain(wpurl, category, ld_add_date, ) VALUES("%s","%s",now())' % (url, category)
+            sql = 'INSERT INTO links_domain(wpurl, category, ld_add_date) VALUES("%s","%s",now())' % (url, category)
             print(sql)
             cursor.execute(sql)
             db.commit()
@@ -34,7 +34,7 @@ class Handler(BaseHandler):
         db = pymysql.connect("localhost", "root", "", "Disease", charset="utf8")
         try:
             cursor = db.cursor()
-            sql = ' INSERT INTO links(link_domain_id, url, name, l_add_date, ) VALUES(%d,"%s","%s",now())' % (
+            sql = ' INSERT INTO links(link_domain_id, url, name, l_add_date) VALUES(%d,"%s","%s",now())' % (
             qid, url, name)
             print(sql)
             cursor.execute(sql)
