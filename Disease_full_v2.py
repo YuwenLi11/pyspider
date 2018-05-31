@@ -49,7 +49,7 @@ class Handler(BaseHandler):
 
     def __init__(self):
         self.base_url = 'http://disease.medlive.cn/wiki/list/171'
-        self.deal = Deal()
+        #self.deal = Deal()
 
     @every(minutes=24 * 60)
     def on_start(self):
