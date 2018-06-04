@@ -1,0 +1,17 @@
+{
+"START_URL":"http://disease.medlive.cn/wiki/list/171",
+"host":"localhost",
+"user":"root",
+"passwd":"2574256",
+"db":"mediv",
+"page_table":"webpages",
+"site_table":"websites",
+"DIR_PATH":"/Users/liyuwen/Desktop/data",
+"CONFIG_FILE_PATH":"/Users/liyuwen/Desktop/pyspider/test.json",
+"CONTENT_FILES_WS_PREFIX":"ws_",
+"CONTENT_FILES_WP_PREFIX":"wp_",
+"CONTENT_FILES_EXT":".html",
+"index_detail_css":".sortCont a",
+"detail_more_detail_css":"dd > a",
+"more_detail_domain_css":".case_name > a"
+}
