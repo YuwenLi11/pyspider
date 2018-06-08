@@ -68,7 +68,7 @@ class Handler(BaseHandler):
             print('Done writing into database')
             ### Create filename and directory path
             fullname = self.CONTENT_FILES_WP_PREFIX + str(wpid) + self.CONTENT_FILES_EXT
-            dir_path = os.path.join(dir_path, self.CONTENT_FILES_WS_PREFIX + str(wsid), str(int(wpid / 100000000)), str(int((wpid % 100000000) / 1000000)), str(int((wpid % 1000000) / 10000)), str(int((wpid % 10000) / 100)))
+            dir_path = os.path.join(dir_path, self.CONTENT_FILES_WS_PREFIX + str(wsid), str(int(wpid / 100000000)).zfill(3), str(int((wpid % 100000000) / 1000000)).zfill(3), str(int((wpid % 1000000) / 10000)).zfill(3), str(int((wpid % 10000) / 100)).zfill(3))
             print(dir_path)
             exists = os.path.exists(dir_path)
             if not exists:
