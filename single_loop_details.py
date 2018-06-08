@@ -12,14 +12,16 @@ from bs4 import BeautifulSoup
 
 CONFIG_FILE_PATH = "/Users/JasonZhang/Desktop/Test_Web/pharmnet_test.json"
 HEADERS_FILE_PATH = "/Users/JasonZhang/Desktop/Test_Web/ws_header.json"
-COOKIES_FILE_PATH = ""
+COOKIES_FILE_PATH = "/Users/JasonZhang/Desktop/Test_Web/pharmnet_cookies.json"
 
 
 class Handler(BaseHandler):
     myheader = json.load(open(HEADERS_FILE_PATH))
+    mycookies = json.load(open(COOKIES_FILE_PATH))
 
     crawl_config = {
-        'headers': myheader
+        'headers': myheader,
+        'cookies': mycookies
     }
 
     def __init__(self):
@@ -58,7 +60,7 @@ class Handler(BaseHandler):
             wp_content_size = len(content)
             ### Save into MySQL databse
             sql = 'INSERT INTO ' + self.page_table + '(wsid, referer_wpid, wpurl, wp_content_md5, wp_content_size, wp_add_date) VALUES(%d,%d,"%s","%s",%d,now())' % (
-                wsid, referer_wpid, wpurl, wp_content_md5, wp_content_size)
+            wsid, referer_wpid, wpurl, wp_content_md5, wp_content_size)
             print(sql)
             cursor.execute(sql)
             wpid = cursor.lastrowid
@@ -66,9 +68,7 @@ class Handler(BaseHandler):
             print('Done writing into database')
             ### Create filename and directory path
             fullname = self.CONTENT_FILES_WP_PREFIX + str(wpid) + self.CONTENT_FILES_EXT
-            dir_path = os.path.join(dir_path, self.CONTENT_FILES_WS_PREFIX + str(wsid), str(int(wpid / 100000000)),
-                                    str(int((wpid % 100000000) / 1000000)), str(int((wpid % 1000000) / 10000)),
-                                    str(int((wpid % 10000) / 100)))
+            dir_path = os.path.join(dir_path, self.CONTENT_FILES_WS_PREFIX + str(wsid), str(int(wpid / 100000000)), str(int((wpid % 100000000) / 1000000)), str(int((wpid % 1000000) / 10000)), str(int((wpid % 10000) / 100)))
             print(dir_path)
             exists = os.path.exists(dir_path)
             if not exists:
@@ -84,7 +84,7 @@ class Handler(BaseHandler):
             ### Update crawl status
             wp_status_crawl = 1
             sql2 = 'UPDATE ' + self.page_table + ' SET wp_status_crawl = %d, wp_last_crawl_date = now() where wpid = %d' % (
-                wp_status_crawl, wpid)
+            wp_status_crawl, wpid)
             cursor.execute(sql2)
 
             db.commit()
@@ -112,8 +112,7 @@ class Handler(BaseHandler):
                 protocol = 9
             print(protocol)
 
-            sql = 'INSERT INTO ' + self.site_table + '(host, protocol, ws_date_added) VALUES("%s",%d,now())' % (
-            hostname, protocol)
+            sql = 'INSERT INTO ' + self.site_table + '(host, protocol, ws_date_added) VALUES("%s",%d,now())' % (hostname, protocol)
             print(sql)
             cursor.execute(sql)
             wsid = cursor.lastrowid
@@ -123,14 +122,14 @@ class Handler(BaseHandler):
             db.rollback()
             print('Something wrong')
             return 0
-
+        
+    
     def save_details(self, wpid, details_names, details_values, details_types):
         db = pymysql.connect(self.host, self.user, self.passwd, self.db, charset=self.dbcharset)
         try:
             cursor = db.cursor()
             print('Connected')
-            sql = 'INSERT INTO ' + self.detail_table + """(wpid, details_names, details_values, details_types, last_updated_date) VALUES(%d,"%s",'%s',%d,now())""" % (
-            wpid, details_names, details_values, details_types)
+            sql = 'INSERT INTO ' + self.detail_table + """(wpid, details_names, details_values, details_types, last_updated_date) VALUES(%d,"%s",'%s',%d,now())""" % (wpid, details_names, details_values, details_types)
             print(sql)
             cursor.execute(sql)
             detail_id = cursor.lastrowid
@@ -142,6 +141,9 @@ class Handler(BaseHandler):
             print('Something wrong')
             return 0
 
+            
+            
+            
     @every(minutes=24 * 60)
     def on_start(self):
         site_url = self.base_url
@@ -149,6 +151,7 @@ class Handler(BaseHandler):
         wsid = self.save_site(site_url, self.DIR_PATH)
         self.crawl(site_url, callback=self.index_page, save={'wsid': wsid, 'qid': 0, 'plv': 0}, fetch_type='js')
 
+        
     @config(age=10 * 24 * 60 * 60)
     def index_page(self, response):
         plv = response.save['plv']
@@ -163,23 +166,22 @@ class Handler(BaseHandler):
         if plv < self.max_plv:
             for each_css in self.total_css[(plv - 1)]['link']:
                 for each in response.doc(each_css).items():
-                    self.crawl(each.attr.href, callback=self.index_page, save={'wsid': wsid, 'qid': qid, 'plv': plv},
-                               fetch_type='js')
+                    self.crawl(each.attr.href, callback=self.index_page, save={'wsid': wsid, 'qid': qid, 'plv': plv}, fetch_type='js')
 
             for each in response.doc(self.total_css[(plv - 1)]['paging']).items():
-                plv = plv - 1
-                qid = referer_wpid
-                self.crawl(each.attr.href, callback=self.index_page, save={'wsid': wsid, 'qid': qid, 'plv': plv},
-                           fetch_type='js')
+                if each.text() == "下一页":
+                    plv = plv - 1
+                    qid = referer_wpid
+                    self.crawl(each.attr.href, callback=self.index_page, save={'wsid': wsid, 'qid': qid, 'plv': plv}, fetch_type='js')
         elif plv == self.max_plv:
-            # detail_name = response.doc('tr > .greys')
-            # print(detail_name)
-            # lis = response.doc('.content > table')
-            # print(lis.each(lambda e: e))
-
-            # for td in lis.find('td.green'):
-            # print(td.text, td.getnext().text)
-
+            #detail_name = response.doc('tr > .greys')
+            #print(detail_name)
+            #lis = response.doc('.content > table')
+            #print(lis.each(lambda e: e))
+            
+            #for td in lis.find('td.green'):
+                #print(td.text, td.getnext().text)
+                
             ### Table_details_text
             for each_css in self.tables_css:
                 table_css = each_css['table_css']
@@ -187,23 +189,25 @@ class Handler(BaseHandler):
                 columns_css = each_css['columns_css']
                 max_item_number = each_css['max_item_number']
                 count = 1;
-                for each_item in range(1, (max_item_number + 1)):
-                    pair_css = table_css + ' ' + rows_css + ':nth-of-type(' + str(each_item) + ') '
+                for each_item in range(1,(max_item_number+1)):
+                    pair_css = table_css + ' ' + rows_css + ':nth-of-type(' + str(each_item) + ') ' 
                     name_css = pair_css + columns_css + ':nth-of-type(1) '
                     value_css = pair_css + columns_css + ':nth-of-type(2) '
-
+                    
                     item_name = response.doc(name_css).text()
                     item_value = response.doc(value_css).text()
-
+                    
                     print(item_name)
                     print(item_value)
-
-                    count = count + 1
+                    
+                    count = count+1
                     if item_name == "":
                         break
-                    else:
+                    else: 
                         detail_id = self.save_details(qid, item_name, item_value, 0)
-
+                        
+                    
+            
             ### Tables_one_value_json
             for each_css in self.json_tables_css:
                 total_table = []
@@ -215,21 +219,21 @@ class Handler(BaseHandler):
                     print('start')
                     # for vertical tables
                     table_data = [[cell.text for cell in row(columns_css)[0:2]]
-                                  for row in BeautifulSoup(str(each))(rows_css)]
+                                  for row in BeautifulSoup(str(each),"lxml")(rows_css)]
                     total_table.append(dict(table_data))
-                # print(json.dumps(dict(table_data), ensure_ascii=False))
-                # print(table_data)
-                table_value_json = json.dumps(total_table, ensure_ascii=False)
-                # print(str(table_value_json))
+                #print(json.dumps(dict(table_data), ensure_ascii=False))
+                #print(table_data)
+                table_value_json = json.dumps(total_table, ensure_ascii = False)    
+                #print(str(table_value_json))
                 item_name = response.doc(title_css).text()
                 detail_id = self.save_details(qid, item_name, table_value_json, 1)
-
-            # for td in response.doc('div.content > table tr:nth-of-type(10) td:nth-of-type(2)').items():
-
-            # print("emmm")
-            # print(td.text())
-            # print("stamp")
-            # for td in response.doc('.content > table').find('td.greys'):
-            # print(td.text, td.getnext().text)
-
+                    
+            #for td in response.doc('div.content > table tr:nth-of-type(10) td:nth-of-type(2)').items():
+                
+                #print("emmm")
+                #print(td.text())
+                #print("stamp")
+            #for td in response.doc('.content > table').find('td.greys'):
+                #print(td.text, td.getnext().text)
+                
         return
