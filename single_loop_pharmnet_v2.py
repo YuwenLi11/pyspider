@@ -187,8 +187,7 @@ class Handler(BaseHandler):
             for each in response.doc(self.detail_paging_css).items():
                 if each.text() == "下一页":
                     plv = plv - 1
-                    qid = referer_wpid
-                    self.crawl(each.attr.href, callback=self.index_page, save={'wsid': wsid, 'qid': qid, 'plv': plv},
+                    self.crawl(each.attr.href, callback=self.index_page, save={'wsid': wsid, 'qid': referer_wpid, 'plv': plv},
                                fetch_type=self.fetch_method, allow_redirects=False)
                     time.sleep(0.05 * self.crawler_type)
             # detail_name = response.doc('tr > .greys')
