@@ -211,13 +211,9 @@ class Handler(BaseHandler):
                 columns_css = each_css['columns_css']
                 max_item_number = each_css['max_item_number']
                 count = 1;
-                for each_item in range(1, (max_item_number + 1)):
-                    pair_css = table_css + ' ' + rows_css + ':nth-of-type(' + str(each_item) + ') '
-                    name_css = pair_css + columns_css + ':nth-of-type(1) '
-                    value_css = pair_css + columns_css + ':nth-of-type(2) '
-
-                    item_name = response.doc(name_css).text()
-                    item_value = response.doc(value_css).text()
+                for row in BeautifulSoup(response.doc(table_css).html(),"lxml")("tr"):
+                    item_name = row("td")[0].text
+                    item_value = row('td')[1].text
 
                     print(item_name)
                     print(item_value)
