@@ -15,15 +15,37 @@
 "CONTENT_FILES_EXT":".html",
 "fetch_method" : "js",
 "max_plv":2,
-"total_css":[
-	{"link":["dd a"], "paging":".page > a:nth-last-of-type(1)", "text":"", "image":""}
+"total_css":
+[
+	{ 
+		"link":
+		[
+			"dd a"
+		], 
+		"paging":".page > a:nth-last-of-type(1)", 
+		"paging_text":"下一页",
+		"text":"", 
+		"image":""
+	}
 ],
-"detail_paging_css":"h6 a:nth-last-of-type(1)",
-"tables_css":[
-	{"table_css":"div.content > table", "rows_css":"tr", "columns_css":"td", "max_item_number":9}
+"detail_paging_css": "h6 a:nth-last-of-type(1)",
+"detail_paging_text": "下一页",
+"tables_css":
+[
+	{
+		"table_css":"div.content > table", 
+		"rows_css":"tr", 
+		"columns_css":"td", 
+		"max_item_number":10
+	}
 ],
 "json_tables_css":[
-	{"table_css":".gys dd > table", "rows_css":"tr", "columns_css":"td", "title_css":".w378 > a"}
+	{
+		"table_css":".gys dd > table", 
+		"rows_css":"tr", 
+		"columns_css":"td", 
+		"title_css":".w378 > a"
+	}
 ]
 
 }
