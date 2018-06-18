@@ -45,6 +45,7 @@ class Handler(BaseHandler):
         self.fetch_method = self.data['fetch_method']
         self.max_plv = self.data['max_plv']
         self.total_css = self.data['total_css']
+        self.detail_page_title = self.data['detail_page_title']
         self.detail_paging_css = self.data['detail_paging_css']
         self.detail_paging_text = self.data['detail_paging_text']
         self.tables_css = self.data['tables_css']
@@ -140,8 +141,9 @@ class Handler(BaseHandler):
         try:
             cursor = db.cursor()
             print('Connected')
-            sql = 'INSERT INTO ' + self.detail_table + """(wsid, wpid, details_names, details_values, details_types, last_updated_date) VALUES(%d, %d,"%s",'%s',%d,now())""" % (
-            wsid, wpid, details_names, details_values, details_types)
+            sql = 'INSERT INTO ' + self.detail_table + """(wsid, wpid, details_names, details_values, details_types, last_updated_date) VALUES(%d, %d,"%s",'%s',%d,now()) on duplicate key UPDATE details_values = CONCAT(details_values, "%s")""" % (
+            wsid, wpid, details_names, details_values, details_types, details_values)
+            # sql = 'INSERT INTO ' + self.detail_table + """(wsid, wpid, details_names, details_values, details_types, last_updated_date) VALUES(%d, %d,"%s",'%s',%d,now())""" % (wsid, wpid, details_names, details_values, details_types)
             print(sql)
             cursor.execute(sql)
             detail_id = cursor.lastrowid
@@ -282,6 +284,10 @@ class Handler(BaseHandler):
 
         #
         elif plv == self.max_plv:
+            detail_page_title_name = self.detail_page_title['name']
+            detail_page_title_value = response.doc(self.detail_page_title['title_css']).text()
+            detail_id = self.save_details(wsid, qid, detail_page_title_name, detail_page_title_value, 0)
+
             for each in response.doc(self.detail_paging_css).items():
                 if each.text() == self.detail_paging_text:
                     plv = plv - 1
@@ -380,10 +386,11 @@ class Handler(BaseHandler):
                             if h3 is None:
                                 break
                             # print("start")
-                            print(h3)
+                            # print(h3.string.strip())
                             try:
                                 print("added")
-                                details_content_items = details_content_items + h3.text.strip()
+                                details_content_items = details_content_items + h3.string.strip()
+
                             except:
                                 pass
                         # print("round done")
