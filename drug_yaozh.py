@@ -287,7 +287,10 @@ class Handler(BaseHandler):
         elif plv == self.max_plv:
             detail_page_title_name = self.detail_page_title['name']
             detail_page_title_value = response.doc(self.detail_page_title['title_css']).text()
-            detail_id = self.save_details(wsid, qid, detail_page_title_name, detail_page_title_value, 0)
+            if detail_page_title_value == "":
+                pass
+            else:
+                detail_id = self.save_details(wsid, qid, detail_page_title_name, detail_page_title_value, 0)
 
             ### Paging
             for each in response.doc(self.detail_paging_css).items():
@@ -366,11 +369,15 @@ class Handler(BaseHandler):
                 # print(each)
                 # print("11111111111")
                 # Read content area
+                soup = ""
                 for each in response.doc(each_content["content_css"]).items():
                     soup = BeautifulSoup(str(each))
+                if soup == "":
+                    continue
                 valid_tag_exist = 0
                 ### Tag for title element
                 for each_title_tag in each_content["content_title_tag"]:
+
                     for h3 in soup.findAll(each_title_tag):
                         print(h3.text.strip())
                         item_name = h3.text.strip()
@@ -401,7 +408,9 @@ class Handler(BaseHandler):
                 if valid_tag_exist == 0:
                     item_name = "全部内容"
                     item_value = each.text()
+                    print("1111")
+                    print(item_value)
                     if item_name == "":
                         continue
                     else:
-                        detail_id = self.save_details(wsid, qid, item_name, item_value, 0)   
+                        detail_id = self.save_details(wsid, qid, item_name, item_value, 0)
