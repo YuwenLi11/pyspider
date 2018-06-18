@@ -34,10 +34,7 @@
 				"value_column":""
 			}
 		],
-		"link":
-		[
-			"dd a"
-		], 
+		"link":[], 
 		"paging":"", 
 		"paging_text":"",
 		"text":"", 
@@ -56,6 +53,11 @@
 		"image":""
 	}
 ],
+"detail_page_title":
+{
+	"name": "网页标题",
+	"title_css":".title"
+},
 "detail_paging_css": "h6 a:nth-last-of-type(1)",
 "detail_paging_text": "下一页",
 "detail_text_content":
