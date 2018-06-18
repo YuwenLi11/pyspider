@@ -178,36 +178,33 @@ class Handler(BaseHandler):
         print(plv)
         qid = self.save_page(wsid, referer_wpid, wpurl, content, self.DIR_PATH)
         print(qid)
-        # webpage not on detail level
+        ### webpage not on detail level
         if plv < self.max_plv:
             # http method decided
-            # Submit form with POST method
+            ### Method1: Submit form with POST method (not completed)
             if self.total_css[(plv - 1)]['method'] == "Post":
                 post_data = {
                     "source": "中美天津史克制药有限公司"
                 }
-
                 self.crawl(response.url, save={'wsid': wsid, 'qid': referer_wpid, 'plv': plv},
                            fetch_type=self.fetch_method, method="POST", data=post_data, callback=self.index_page)
-
                 print("post finished")
 
 
-
-            # Submit form with GET method
+            ### Method2: Submit form with GET method
             elif self.total_css[(plv - 1)]['method_data'] != []:
                 if self.total_css[(plv - 1)]['method_data'] != []:
                     print(self.total_css[(plv - 1)]['method_data'])
                     param_count = 0
                     param_names = []
                     param_pair = {}
+                    ### Read parameters from json and csv
                     for each_param in self.total_css[(plv - 1)]['method_data']:
                         param_count = param_count + 1
                         param_name = each_param["name"]
                         param_names.append(param_name)
                         if each_param["value"] != "":
                             param_value_set = [each_param["value"]]
-
                         elif each_param["value_path"] != "":
                             param_column = each_param["value_column"]
                             param_path = each_param["value_path"]
@@ -230,6 +227,7 @@ class Handler(BaseHandler):
 
                     params_data = []
                     dic = {}
+                    ### Two parameter dictonary sets generation
                     if param_count == 2:
                         list_all = (list(itertools.product(param_pair['set_1'], param_pair['set_2'])))
 
@@ -245,9 +243,12 @@ class Handler(BaseHandler):
 
                             # print(params_data)
                             # print("11111111111")
+                    ### One parameter dictonary sets generation
                     else:
                         for i in range(len(list_all)):
                             dic[param_names[0]] = list(param_pair[i])[0]
+
+                    ### Crawl for each set of parameters
                     for each in params_data[60:65]:
                         # params_data = {
                         # "source": "中美天津史克制药有限公司"
@@ -259,9 +260,9 @@ class Handler(BaseHandler):
                         time.sleep(0.05 * self.crawler_type)
 
 
-
+            ### Method3: Direct URL picking and paging
             else:
-                # Direct url call
+                ### Direct url call
                 for each_css in self.total_css[(plv - 1)]['link']:
                     for each in response.doc(each_css).items():
                         self.crawl(each.attr.href, callback=self.index_page,
@@ -269,7 +270,7 @@ class Handler(BaseHandler):
                                    allow_redirects=False, cookies=response.cookies)
                     time.sleep(0.02 * self.crawler_type)
 
-                # Paging
+                ### Paging
                 for each in response.doc(self.total_css[(plv - 1)]['paging']).items():
                     if each.text() == self.total_css[(plv - 1)]['paging_text']:
                         plv = plv - 1
@@ -282,19 +283,18 @@ class Handler(BaseHandler):
 
 
 
-        #
+        ### If the page level is on detail page
         elif plv == self.max_plv:
             detail_page_title_name = self.detail_page_title['name']
             detail_page_title_value = response.doc(self.detail_page_title['title_css']).text()
             detail_id = self.save_details(wsid, qid, detail_page_title_name, detail_page_title_value, 0)
 
+            ### Paging
             for each in response.doc(self.detail_paging_css).items():
                 if each.text() == self.detail_paging_text:
-                    plv = plv - 1
-
                     self.crawl(each.attr.href, callback=self.index_page,
-                               save={'wsid': wsid, 'qid': referer_wpid, 'plv': plv}, fetch_type=self.fetch_method,
-                               allow_redirects=False)
+                               save={'wsid': wsid, 'qid': referer_wpid, 'plv': (self.max_plv - 1)},
+                               fetch_type=self.fetch_method, allow_redirects=False)
                     time.sleep(0.05 * self.crawler_type)
             # detail_name = response.doc('tr > .greys')
             # print(detail_name)
@@ -306,7 +306,7 @@ class Handler(BaseHandler):
 
             ##########
 
-            ### extract details
+            ### Extract Details
 
             ##########
 
@@ -362,19 +362,14 @@ class Handler(BaseHandler):
                 detail_id = self.save_details(wsid, qid, item_name, table_value_json, 1)
 
             ### TEST text content extract
-            # for each in response.doc('.content').items():
-            # for each_h3 in each.find('h3'):
-            # print(each_h3.text)
-            # print(each.find("h3"))
-            # print(each.text())
-            # each("h3").text())
-
             for each_content in self.detail_text_content:
                 # print(each)
-                print("11111111111")
+                # print("11111111111")
+                # Read content area
                 for each in response.doc(each_content["content_css"]).items():
                     soup = BeautifulSoup(str(each))
                 valid_tag_exist = 0
+                ### Tag for title element
                 for each_title_tag in each_content["content_title_tag"]:
                     for h3 in soup.findAll(each_title_tag):
                         print(h3.text.strip())
@@ -402,10 +397,11 @@ class Handler(BaseHandler):
                             detail_id = self.save_details(wsid, qid, item_name, item_value, 0)
 
                         valid_tag_exist = 1
+                ### if no title tag found, save all text content as "全部内容"
                 if valid_tag_exist == 0:
                     item_name = "全部内容"
                     item_value = each.text()
                     if item_name == "":
                         continue
                     else:
-                        detail_id = self.save_details(wsid, qid, item_name, item_value, 0)
+                        detail_id = self.save_details(wsid, qid, item_name, item_value, 0)   
