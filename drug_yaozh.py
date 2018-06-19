@@ -4,6 +4,8 @@ import pymysql
 import datetime
 import os
 from urllib.parse import urlparse
+from urllib.parse import quote
+from urllib.request import urlopen
 import hashlib
 import time
 from bs4 import BeautifulSoup
@@ -12,9 +14,9 @@ import itertools
 
 ## str(datetime.datetime.now()) # current time
 
-CONFIG_FILE_PATH = "/Users/JasonZhang/Desktop/Test_Web/yaozhi_test.json"
-HEADERS_FILE_PATH = "/Users/JasonZhang/Desktop/Test_Web/ws_header.json"
-COOKIES_FILE_PATH = "/Users/JasonZhang/Desktop/Test_Web/pharmnet_cookies.json"
+CONFIG_FILE_PATH = "/Users/JasonZhang1/Desktop/Test_Web/yaozhi_test.json"
+HEADERS_FILE_PATH = "/Users/JasonZhang1/Desktop/Test_Web/ws_header.json"
+COOKIES_FILE_PATH = "/Users/JasonZhang1/Desktop/Test_Web/pharmnet_cookies.json"
 
 
 class Handler(BaseHandler):
@@ -63,9 +65,13 @@ class Handler(BaseHandler):
             cursor = db.cursor()
             print('Connected')
             ### Get md5 hash value and content size
-            m = hashlib.md5()
-            m.update(content.encode('utf-8'))
-            wp_content_md5 = m.hexdigest()
+            if wpurl[-4:] == ".rar" or wpurl[-4:] == ".zip":
+                wp_content_md5 = ""
+            else:
+                m = hashlib.md5()
+                m.update(content.encode('utf-8'))
+                wp_content_md5 = m.hexdigest()
+            print("testtest")
             wp_content_size = len(content)
             ### Save into MySQL databse
             sql = 'INSERT INTO ' + self.page_table + '(wsid, referer_wpid, wpurl, wp_content_md5, wp_content_size, wp_add_date) VALUES(%d,%d,"%s","%s",%d,now())' % (
@@ -88,7 +94,10 @@ class Handler(BaseHandler):
                 os.makedirs(dir_path)
             ### Save html into directory
             file_path = os.path.join(dir_path, fullname)
-            f = open(file_path, "w+")
+            if wpurl[-4:] == ".rar" or wpurl[-4:] == ".zip":
+                f = open(file_path, "wb")
+            else:
+                f = open(file_path, "w+")
             print('Successfully open')
             # f.write(content.encode('utf-8'))
             f.write(content)
@@ -173,7 +182,14 @@ class Handler(BaseHandler):
         wsid = response.save['wsid']
         wpurl = response.url
         content = response.content
-        print(response.encoding)
+        ### Decide if .rar or .zip file
+        if wpurl == "":
+            url_org = response.save['url']
+            wpurl = quote(url_org, safe='/:?=')
+            if wpurl[-4:] == ".rar" or wpurl[-4:] == ".zip":
+                url = urlopen(wpurl)
+                content = url.read()
+        # print(response.content)
         referer_wpid = response.save['qid']
         plv = plv + 1
         print(plv)
@@ -250,7 +266,7 @@ class Handler(BaseHandler):
                             dic[param_names[0]] = list(param_pair[i])[0]
 
                     ### Crawl for each set of parameters
-                    for each in params_data[60:65]:
+                    for each in params_data:
                         # params_data = {
                         # "source": "中美天津史克制药有限公司"
                         # }
@@ -261,14 +277,14 @@ class Handler(BaseHandler):
                         time.sleep(0.05 * self.crawler_type)
 
 
-            ### Method3: Direct URL picking and paging
+            ### Method3: Direct URL picking and paging            
             else:
                 ### Direct url call
                 for each_css in self.total_css[(plv - 1)]['link']:
                     for each in response.doc(each_css).items():
                         self.crawl(each.attr.href, callback=self.index_page,
-                                   save={'wsid': wsid, 'qid': qid, 'plv': plv}, fetch_type=self.fetch_method,
-                                   allow_redirects=False, cookies=response.cookies)
+                                   save={'wsid': wsid, 'qid': qid, 'plv': plv, "url": each.attr.href},
+                                   fetch_type=self.fetch_method, allow_redirects=False, cookies=response.cookies)
                     time.sleep(0.02 * self.crawler_type)
 
                 ### Paging
@@ -428,3 +444,5 @@ class Handler(BaseHandler):
                         continue
                     else:
                         detail_id = self.save_details(wsid, qid, item_name, item_value, 0)
+
+
