@@ -53,6 +53,7 @@
 		"image":""
 	}
 ],
+"single_detail_data_type" :"Yes",
 "detail_page_title":
 {
 	"name": "网页标题",

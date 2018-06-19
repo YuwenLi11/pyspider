@@ -45,6 +45,7 @@ class Handler(BaseHandler):
         self.fetch_method = self.data['fetch_method']
         self.max_plv = self.data['max_plv']
         self.total_css = self.data['total_css']
+        self.single_detail_data_type = self.data['single_detail_data_type']
         self.detail_page_title = self.data['detail_page_title']
         self.detail_paging_css = self.data['detail_paging_css']
         self.detail_paging_text = self.data['detail_paging_text']
@@ -313,6 +314,9 @@ class Handler(BaseHandler):
 
             ##########
 
+            ### Exist data type to prevent duplicated items
+            exist_data_type = 0
+
             ### Table_details_text
             for each_css in self.tables_css:
                 table_css = each_css['table_css']
@@ -343,6 +347,11 @@ class Handler(BaseHandler):
                             break
                         else:
                             detail_id = self.save_details(wsid, qid, item_name, item_value, 0)
+                            exist_data_type = 1
+            ### If only one data type allowed, stop here
+            if self.single_detail_data_type == "Yes":
+                if exist_data_type == 1:
+                    return
 
             ### Tables_one_value_json
             for each_css in self.json_tables_css:
@@ -363,6 +372,11 @@ class Handler(BaseHandler):
                 # print(str(table_value_json))
                 item_name = response.doc(title_css).text()
                 detail_id = self.save_details(wsid, qid, item_name, table_value_json, 1)
+                exist_data_type = 1
+            ### If only one data type allowed, stop here
+            if self.single_detail_data_type == "Yes":
+                if exist_data_type == 1:
+                    return
 
             ### TEST text content extract
             for each_content in self.detail_text_content:
