@@ -1,0 +1,53 @@
+{
+"START_URL":"http://www.a-hospital.com/w/%E7%97%87%E7%8A%B6%E6%9D%A1%E7%9B%AE%E7%B4%A2%E5%BC%95-A",
+"BE_A_GOOD_CRAWLER":0,
+"host":"localhost",
+"user":"root",
+"passwd":"2574256",
+"db":"pharmnet",
+"charset":"utf8",
+"page_table":"webpages",
+"site_table":"websites",
+"detail_table":"webpages_details",
+"DIR_PATH":"/Users/liyuwen/Desktop/data_p",
+"CONTENT_FILES_WS_PREFIX":"ws_",
+"CONTENT_FILES_WP_PREFIX":"wp_",
+"CONTENT_FILES_EXT":".html",
+"fetch_method" : "js",
+"max_plv":2,
+"total_css":
+[
+	{ 
+		"link":
+		[
+			"div#content div > ul a"
+		], 
+		"paging":"p:nth-of-type(4) a", 
+		"paging_text":"",
+		"text":"", 
+		"image":""
+	}
+],
+
+"detail_page_title": "h1.firstHeading",
+"detail_page_value": "div#content",
+"tables_css":
+[
+	{
+		"table_css":"div.content > table", 
+		"rows_css":"tr", 
+		"columns_css":"td", 
+		"max_item_number":10
+	}
+],
+"json_tables_css":[
+	{
+		"table_css":".gys dd > table", 
+		"rows_css":"tr", 
+		"columns_css":"td", 
+		"title_css":".w378 > a"
+	}
+]
+
+}
+
