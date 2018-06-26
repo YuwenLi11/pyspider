@@ -1,0 +1,10 @@
+{
+	"webui":
+	{
+		"port":8000
+	},
+	"fetcher-num": 1,
+	"processor-num": 1
+
+	
+}

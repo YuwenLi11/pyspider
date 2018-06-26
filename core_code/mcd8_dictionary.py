@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 
 ## str(datetime.datetime.now()) # current time
 
-CONFIG_FILE_PATH = "/Users/liyuwen/Desktop/aplus.json"
+CONFIG_FILE_PATH = "/Users/liyuwen/Desktop/pyspider/config_file/mcd8_dictionary.json"
 HEADERS_FILE_PATH = "/Users/liyuwen/Desktop/test_file/ws_header.json"
 COOKIES_FILE_PATH = "/Users/liyuwen/Desktop/test_file/pharmnet_cookies.json"
 
@@ -21,7 +21,6 @@ class Handler(BaseHandler):
 
     crawl_config = {
         'headers': myheader,
-        'proxy': '117.127.0.210:80'
         # 'cookies': mycookies
     }
 
@@ -44,10 +43,13 @@ class Handler(BaseHandler):
         self.fetch_method = self.data['fetch_method']
         self.max_plv = self.data['max_plv']
         self.total_css = self.data['total_css']
+        self.single_detail_data_type = self.data['single_detail_data_type']
         self.detail_page_title = self.data['detail_page_title']
-        self.detail_page_value = self.data['detail_page_value']
+        self.detail_paging_css = self.data['detail_paging_css']
+        self.detail_paging_text = self.data['detail_paging_text']
         self.tables_css = self.data['tables_css']
         self.json_tables_css = self.data['json_tables_css']
+        self.detail_text_content = self.data['detail_text_content']
         self.crawler_type = self.data['BE_A_GOOD_CRAWLER']
         self.base_url = self.START_URL
         db = pymysql.connect(self.host, self.user, self.passwd, self.db, charset=self.dbcharset)
@@ -156,51 +158,45 @@ class Handler(BaseHandler):
         site_url = self.base_url
         print(site_url)
         wsid = self.save_site(site_url, self.DIR_PATH)
-        self.crawl(site_url, callback=self.index_page, save={'wsid': wsid, 'qid': 0, 'plv': 0},
+        self.crawl(site_url, callback=self.index_page, save={'wsid': wsid, 'qid': 0, 'plv': 0, 'up' : 1, 'down' : 1},
                    fetch_type=self.fetch_method)
 
     @config(age=10 * 24 * 60 * 60)
     def index_page(self, response):
-        plv = response.save['plv']
         wsid = response.save['wsid']
+        up = response.save['up']
+        down = response.save['down']
         wpurl = response.url
         content = response.content
         print(response.encoding)
         referer_wpid = response.save['qid']
-        plv = plv + 1
-        print(plv)
         qid = self.save_page(wsid, referer_wpid, wpurl, content, self.DIR_PATH)
-        print(qid)
-        if plv < self.max_plv:
-            for each_css in self.total_css[(plv - 1)]['link']:
-                for each in response.doc(each_css).items():
-                    self.crawl(each.attr.href, callback=self.index_page, save={'wsid': wsid, 'qid': qid, 'plv': plv},
-                              fetch_type=self.fetch_method, allow_redirects=False)
-                    time.sleep(0.02 * self.crawler_type)
-            
-            for each in response.doc(self.total_css[(plv - 1)]['paging']).items():
-                if response.url[-1] == 'A':
-                    self.crawl(each.attr.href, callback=self.index_page,
-                        save={'wsid': wsid, 'qid': referer_wpid, 'plv': 0}, fetch_type=self.fetch_method,
-                        allow_redirects=False)
-                    time.sleep(0.05 * self.crawler_type)
         
-        elif plv == self.max_plv:
-            detail_page_name = response.doc( self.detail_page_title).text()
-            detail_page_value = response.doc('div > p:nth-of-type(1)').text()
-
-            soup = BeautifulSoup(response.doc(self.detail_page_value).html(),'lxml')
-
-            start = soup.find('span', class_='mw-headline').text
-            index_start = response.doc(self.detail_page_value).text().split('\n').index(start)
-
-            end = response.doc('div > p:nth-last-of-type(2)').text()
-            index_end = response.doc(self.detail_page_value).text().split('\n').index(end)
-
-            for index in range(index_start,index_end):
-                detail_page_value = detail_page_value + response.doc(self.detail_page_value).text().split('\n')[index]
-
-            detail_id = self.save_details(wsid, qid, detail_page_name, detail_page_value, 0)
-                    
- 
+        
+        soup = BeautifulSoup(response.doc(self.detail_text_content['content_total']).html(), 'lxml')
+        
+        detail_page_title_name = self.detail_page_title['name']
+        detail_page_title_value = soup.find(self.detail_page_title['title_css'], 
+                                            class_ = self.detail_page_title['title_css_class']).text
+        detail_id = self.save_details(wsid, qid, detail_page_title_name, detail_page_title_value, 0)
+                            
+        for index in range(len(soup.find_all(self.detail_text_content['content_css'],
+                                             class_ = self.detail_text_content['content_css_class'][0]))):
+            detail_page_name = soup.find_all(self.detail_text_content['content_css'],
+                                             class_ = self.detail_text_content['content_css_class'][0])[index].text
+            detail_page_value = soup.find_all(self.detail_text_content['content_css'],
+                                              class_ = self.detail_text_content['content_css_class'][1])[index].text
+            detail_id = self.save_details(wsid, qid, detail_page_name, detail_page_value, 0)  
+            #print(soup.find_all('div', class_ = 'dict')[index].text)
+            #print(soup.find_all('div', class_ = 'content')[index].text)
+        
+        if up == 1:            
+            self.crawl(response.doc(self.detail_paging_css['up']).attr.href,callback=self.index_page,
+                        save={'wsid': wsid, 'qid': qid,'up' : 1, 'down' : 0}, 
+                        fetch_type=self.fetch_method, allow_redirects=False)
+            
+        if down == 1:
+            self.crawl(response.doc(self.detail_paging_css['down']).attr.href,callback=self.index_page,
+                        save={'wsid': wsid, 'qid': qid,'up' : 0, 'down' : 1}, 
+                        fetch_type=self.fetch_method, allow_redirects=False)
 

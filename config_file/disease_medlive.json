@@ -1,0 +1,124 @@
+{
+"START_URL":"http://disease.medlive.cn/wiki/list/171",
+"BE_A_GOOD_CRAWLER":0,
+"host":"localhost",
+"user":"crawler",
+"passwd":"password",
+"db":"crawler",
+"charset":"utf8",
+"page_table":"webpages",
+"site_table":"websites",
+"detail_table":"webpages_details",
+"DIR_PATH":"/home/crawler/result/data",
+"CONTENT_FILES_WS_PREFIX":"ws_",
+"CONTENT_FILES_WP_PREFIX":"wp_",
+"CONTENT_FILES_EXT":".html",
+"fetch_method" : "js",
+"max_plv":5,
+"total_css":
+[
+	{ 
+		"method":"GET",
+		"method_data":[],
+		"link":
+		[
+			".sortCont a"
+		], 
+		"paging":"", 
+		"paging_text":"",
+		"text":"", 
+		"image":"",
+		"lv_key_tag_css":[],
+		"lv_key_tag_value":[]
+	},
+	{ 
+		"method":"GET",
+		"method_data":[],
+		"link":
+		[
+			"dd > a"
+		], 
+		"paging":"", 
+		"paging_text":"",
+		"text":"", 
+		"image":"",
+		"lv_key_tag_css":[],
+		"lv_key_tag_value":[]
+	},
+	{ 
+		"method":"GET",
+		"method_data":[],
+		"link":
+		[
+			".case_name > a"
+		], 
+		"paging":"", 
+		"paging_text":"",
+		"text":"", 
+		"image":"",
+		"lv_key_tag_css":
+		[
+			".case_name > a"
+		],
+		"lv_key_tag_value":
+		[
+			"查看知识库词条 >>"
+		]
+	},
+	{ 
+		"method":"GET",
+		"method_data":[],
+		"link":
+		[
+			"dd > a"
+		], 
+		"paging":"", 
+		"paging_text":"",
+		"text":"", 
+		"image":"",
+		"lv_key_tag_css":[],
+		"lv_key_tag_value":[]
+	}
+],
+"single_detail_data_type" :"Yes",
+"detail_page_title":
+{
+	"name": "网页标题",
+	"title_css":".main > .part h3 > span"
+},
+"detail_paging_css": "",
+"detail_paging_text": "",
+"detail_text_content":
+[
+	{
+		"content_css":".skin_knw .bd",
+		"content_title_tag":
+		[
+			"strong",
+			"h3"
+		]
+	}
+],
+"tables_css":
+[
+	{
+		"table_css":"div.content > table", 
+		"rows_css":"tr", 
+		"columns_css":"td", 
+		"max_item_number":10
+	}
+],
+"json_tables_css":[],
+"detail_pairs_css":
+[
+	{
+		"name_css": ".skin_knw h3 > span",
+		"value_css": ".editor_mirror_del"
+	},
+	{
+		"name_css":".hd2 > h3",
+		"value_css":".bd2 > div.bd2_cont"
+	}
+]
+
+}

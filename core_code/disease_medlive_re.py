@@ -1,5 +1,3 @@
-
-
 from pyspider.libs.base_handler import *
 import json
 import pymysql
@@ -16,7 +14,7 @@ import itertools
 
 ## str(datetime.datetime.now()) # current time
 
-CONFIG_FILE_PATH = "/Users/JasonZhang1/Desktop/Test_Web/yaozhi_test.json"
+CONFIG_FILE_PATH = "/Users/JasonZhang1/Desktop/Test_Web/disease_medlive_test.json"
 HEADERS_FILE_PATH = "/Users/JasonZhang1/Desktop/Test_Web/ws_header.json"
 COOKIES_FILE_PATH = "/Users/JasonZhang1/Desktop/Test_Web/pharmnet_cookies.json"
 
@@ -55,6 +53,7 @@ class Handler(BaseHandler):
         self.detail_paging_text = self.data['detail_paging_text']
         self.tables_css = self.data['tables_css']
         self.json_tables_css = self.data['json_tables_css']
+        self.detail_pairs_css = self.data['detail_pairs_css']
         self.detail_text_content = self.data['detail_text_content']
         self.crawler_type = self.data['BE_A_GOOD_CRAWLER']
         self.start_url = self.START_URL
@@ -69,12 +68,14 @@ class Handler(BaseHandler):
             ### Get md5 hash value and content size
             if wpurl[-4:] == ".rar" or wpurl[-4:] == ".zip" or wpurl[-4:] == ".pdf":
                 wp_content_md5 = ""
+                wp_content_size = 0
             else:
                 m = hashlib.md5()
                 m.update(content.encode('utf-8'))
                 wp_content_md5 = m.hexdigest()
+                wp_content_size = len(content)
             print("testtest")
-            wp_content_size = len(content)
+
             ### Save into MySQL databse
             sql = 'INSERT INTO ' + self.page_table + '(wsid, referer_wpid, wpurl, wp_content_md5, wp_content_size, wp_add_date) VALUES(%d,%d,"%s","%s",%d,now())' % (
                 wsid, referer_wpid, wpurl, wp_content_md5, wp_content_size)
@@ -100,7 +101,7 @@ class Handler(BaseHandler):
                 # f = open(file_path, "wb")
                 db.commit()
                 print('non-html files')
-                return wsid
+                return wpid
             else:
                 f = open(file_path, "w+")
             print('Successfully open')
@@ -186,17 +187,30 @@ class Handler(BaseHandler):
         plv = response.save['plv']
         wsid = response.save['wsid']
         wpurl = response.url
+        referer_wpid = response.save['qid']
+        plv = plv + 1
+        ### If this page meet the skippable condition
+        if plv < self.max_plv:
+            key_tag_css = self.total_css[(plv - 1)]['lv_key_tag_css']
+            for each_tag_number in range(0, len(key_tag_css)):
+                if response.doc(key_tag_css[each_tag_number]).text() != self.total_css[(plv - 1)]['lv_key_tag_value'][
+                    each_tag_number]:
+                    self.crawl(wpurl, callback=self.index_page,
+                               save={'wsid': wsid, 'qid': referer_wpid, 'plv': plv, "url": wpurl},
+                               fetch_type=self.fetch_method, allow_redirects=False, cookies=response.cookies)
+                    return
+
         content = response.content
         ### Decide if .rar or .zip file
         if wpurl == "":
             url_org = response.save['url']
             wpurl = quote(url_org, safe='/:?=')
+            ### for now, rar,zip and pdf file will not be saved and crawl status will be 0
             # if wpurl[-4:] == ".rar" or wpurl[-4:] == ".zip":
             # url = urlopen(wpurl)
             # content = url.read()
         # print(response.content)
-        referer_wpid = response.save['qid']
-        plv = plv + 1
+
         print(plv)
         qid = self.save_page(wsid, referer_wpid, wpurl, content, self.DIR_PATH)
         print(qid)
@@ -307,6 +321,7 @@ class Handler(BaseHandler):
 
         ### If the page level is on detail page
         elif plv == self.max_plv:
+            ### webpage title
             detail_page_title_name = self.detail_page_title['name']
             detail_page_title_value = response.doc(self.detail_page_title['title_css']).text()
             if detail_page_title_value == "":
@@ -399,6 +414,18 @@ class Handler(BaseHandler):
                 if exist_data_type == 1:
                     return
 
+            ### simple name value pair extract
+            for each_pair in self.detail_pairs_css:
+                if each_pair["name_css"] == "":
+                    item_name = each_pair["name"]
+                else:
+                    item_name = response.doc(each_pair["name_css"]).text()
+                item_value = response.doc(each_pair["value_css"]).text()
+                if item_name == "":
+                    continue
+                else:
+                    detail_id = self.save_details(wsid, qid, item_name, item_value, 0)
+
             ### TEST text content extract
             for each_content in self.detail_text_content:
                 # print(each)
@@ -445,7 +472,7 @@ class Handler(BaseHandler):
                     item_value = each.text()
                     print("1111")
                     print(item_value)
-                    if item_name == "":
+                    if item_value == "":
                         continue
                     else:
                         detail_id = self.save_details(wsid, qid, item_name, item_value, 0)
