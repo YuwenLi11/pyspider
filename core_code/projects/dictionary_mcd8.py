@@ -11,7 +11,7 @@ import urllib.request
 
 ## str(datetime.datetime.now()) # current time
 
-CONFIG_FILE_PATH = "/data/apps/crawler/envi-pyspider/config_file/mcd8_dictionary.json"
+CONFIG_FILE_PATH = "/data/apps/crawler/envi-pyspider/config_file/dictionary_mcd8.json"
 HEADERS_FILE_PATH = "/data/apps/crawler/envi-pyspider/config_file/ws_header.json"
 COOKIES_FILE_PATH = "/data/apps/crawler/envi-pyspider/config_file/cookies.json"
 

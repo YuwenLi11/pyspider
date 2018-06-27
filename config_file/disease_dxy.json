@@ -1,0 +1,86 @@
+{
+"START_URL":"https://dxy.com/diseases/",
+"BE_A_GOOD_CRAWLER":0,
+"host":"localhost",
+"user":"crawler",
+"passwd":"password",
+"db":"crawler",
+"charset":"utf8",
+"page_table":"webpages",
+"site_table":"websites",
+"detail_table":"webpages_details",
+"DIR_PATH":"/home/crawler/result/data",
+"CONTENT_FILES_WS_PREFIX":"ws_",
+"CONTENT_FILES_WP_PREFIX":"wp_",
+"CONTENT_FILES_EXT":".html",
+"fetch_method" : "js",
+"max_plv":3,
+"total_css":
+[
+	{ 
+		"method":"GET",
+		"method_data":[],
+		"link":
+		[
+			"li.section-navbar-item:nth-last-of-type(-n+26) a"
+		], 
+		"paging":"", 
+		"paging_text":"",
+		"text":"", 
+		"image":"",
+		"allow_redirects":"True"
+	},
+	{ 
+		"method":"GET",
+		"method_data":
+		[
+			{
+				"name":"section_group_name", 
+				"value":"CURRENT_WEBPAGE", 
+				"value_path":"", 
+				"value_column":""
+			},
+			{
+				"name":"page_index", 
+				"value":"PAGING", 
+				"value_path":"", 
+				"value_column":""
+			}
+
+		],
+		"link":
+		[ 
+			"div.lr-container-left div.content a.disease-card-info-title"
+		], 
+		"paging":"", 
+		"paging_text":"",
+		"text":"", 
+		"image":"",
+		"allow_redirects":"True"
+	}
+],
+"single_detail_data_type":"No",
+"detail_page_title":
+{
+	"name": "网页标题",
+	"title_css":"li > h1"
+},
+"detail_paging_css": "h6 a:nth-last-of-type(1)",
+"detail_paging_text": "下一页",
+"detail_text_content":
+[
+	{
+	"content_css":".disease-card-info-content",
+		"content_title_tag":
+		[
+			"strong",
+			"h3"
+		]
+	}
+],
+"tables_css":
+[
+],
+"json_tables_css":[]
+
+}
