@@ -10,9 +10,9 @@ from bs4 import BeautifulSoup
 
 ## str(datetime.datetime.now()) # current time
 
-CONFIG_FILE_PATH = "/Users/JasonZhang/Desktop/Test_Web/pharmnet_test.json"
-HEADERS_FILE_PATH = "/Users/JasonZhang/Desktop/Test_Web/ws_header.json"
-COOKIES_FILE_PATH = "/Users/JasonZhang/Desktop/Test_Web/pharmnet_cookies.json"
+CONFIG_FILE_PATH = "/data/apps/crawler/envi-pyspider/config_file/a_hospital.json"
+HEADERS_FILE_PATH = "/data/apps/crawler/envi-pyspider/config_file/ws_header.json"
+COOKIES_FILE_PATH = "/data/apps/crawler/envi-pyspider/config_file/pharmnet_cookies.json"
 
 
 class Handler(BaseHandler):
@@ -20,8 +20,7 @@ class Handler(BaseHandler):
     mycookies = json.load(open(COOKIES_FILE_PATH))
 
     crawl_config = {
-        'headers': myheader,
-        # 'cookies': mycookies
+        'headers': myheader
     }
 
     def __init__(self):
@@ -43,8 +42,8 @@ class Handler(BaseHandler):
         self.fetch_method = self.data['fetch_method']
         self.max_plv = self.data['max_plv']
         self.total_css = self.data['total_css']
-        self.detail_paging_css = self.data['detail_paging_css']
-        self.detail_paging_text = self.data['detail_paging_text']
+        self.detail_page_title = self.data['detail_page_title']
+        self.detail_page_value = self.data['detail_page_value']
         self.tables_css = self.data['tables_css']
         self.json_tables_css = self.data['json_tables_css']
         self.crawler_type = self.data['BE_A_GOOD_CRAWLER']
@@ -174,84 +173,32 @@ class Handler(BaseHandler):
             for each_css in self.total_css[(plv - 1)]['link']:
                 for each in response.doc(each_css).items():
                     self.crawl(each.attr.href, callback=self.index_page, save={'wsid': wsid, 'qid': qid, 'plv': plv},
-                               fetch_type=self.fetch_method, allow_redirects=False)
+                              fetch_type=self.fetch_method, allow_redirects=False)
                     time.sleep(0.02 * self.crawler_type)
-
+            
             for each in response.doc(self.total_css[(plv - 1)]['paging']).items():
-                if each.text() == self.total_css[(plv - 1)]['paging_text']:
-                    plv = plv - 1
+                if response.url[-1] == 'A':
                     self.crawl(each.attr.href, callback=self.index_page,
-                               save={'wsid': wsid, 'qid': referer_wpid, 'plv': plv}, fetch_type=self.fetch_method,
-                               allow_redirects=False)
+                        save={'wsid': wsid, 'qid': referer_wpid, 'plv': 0}, fetch_type=self.fetch_method,
+                        allow_redirects=False)
                     time.sleep(0.05 * self.crawler_type)
+        
         elif plv == self.max_plv:
-            for each in response.doc(self.detail_paging_css).items():
-                if each.text() == self.detail_paging_text:
-                    plv = plv - 1
+            detail_page_name = response.doc( self.detail_page_title).text()
+            detail_page_value = response.doc('div > p:nth-of-type(1)').text()
 
-                    self.crawl(each.attr.href, callback=self.index_page,
-                               save={'wsid': wsid, 'qid': referer_wpid, 'plv': plv}, fetch_type=self.fetch_method,
-                               allow_redirects=False)
-                    time.sleep(0.05 * self.crawler_type)
-            # detail_name = response.doc('tr > .greys')
-            # print(detail_name)
-            # lis = response.doc('.content > table')
-            # print(lis.each(lambda e: e))
+            soup = BeautifulSoup(response.doc(self.detail_page_value).html(),'lxml')
 
-            # for td in lis.find('td.green'):
-            # print(td.text, td.getnext().text)
+            start = soup.find('span', class_='mw-headline').text
+            index_start = response.doc(self.detail_page_value).text().split('\n').index(start)
 
-            ##########
+            end = response.doc('div > p:nth-last-of-type(2)').text()
+            index_end = response.doc(self.detail_page_value).text().split('\n').index(end)
 
-            ### extract details
+            for index in range(index_start,index_end):
+                detail_page_value = detail_page_value + response.doc(self.detail_page_value).text().split('\n')[index]
 
-            ##########
+            detail_id = self.save_details(wsid, qid, detail_page_name, detail_page_value, 0)
+                    
+ 
 
-            ### Table_details_text
-            for each_css in self.tables_css:
-                table_css = each_css['table_css']
-                rows_css = each_css['rows_css']
-                columns_css = each_css['columns_css']
-                # max_item_number = each_css['max_item_number']
-                # count = 1;
-
-                # for each_item in range(1,(max_item_number+1)):
-                # pair_css = table_css + ' ' + rows_css + ':nth-of-type(' + str(each_item) + ') '
-                # name_css = pair_css + columns_css + ':nth-of-type(1) '
-                # value_css = pair_css + columns_css + ':nth-of-type(2) '
-
-                # item_name = response.doc(name_css).text()
-                # item_value = response.doc(value_css).text()
-
-                for row in BeautifulSoup(response.doc(table_css).html(), "lxml")("tr"):
-                    item_name = row("td")[0].text
-                    item_value = row('td')[1].text
-
-                    print(item_name)
-                    print(item_value)
-
-                    # count = count+1
-                    if item_name == "":
-                        break
-                    else:
-                        detail_id = self.save_details(wsid, qid, item_name, item_value, 0)
-
-            ### Tables_one_value_json
-            for each_css in self.json_tables_css:
-                total_table = []
-                table_css = each_css['table_css']
-                rows_css = each_css['rows_css']
-                columns_css = each_css['columns_css']
-                title_css = each_css['title_css']
-                for each in response.doc(table_css).items():
-                    print('start')
-                    # for vertical tables
-                    table_data = [[cell.text for cell in row(columns_css)[0:2]]
-                                  for row in BeautifulSoup(str(each), "lxml")(rows_css)]
-                    total_table.append(dict(table_data))
-                # print(json.dumps(dict(table_data), ensure_ascii=False))
-                # print(table_data)
-                table_value_json = json.dumps(total_table, ensure_ascii=False)
-                # print(str(table_value_json))
-                item_name = response.doc(title_css).text()
-                detail_id = self.save_details(wsid, qid, item_name, table_value_json, 1)

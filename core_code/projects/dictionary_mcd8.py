@@ -7,12 +7,13 @@ from urllib.parse import urlparse
 import hashlib
 import time
 from bs4 import BeautifulSoup
+import urllib.request
 
 ## str(datetime.datetime.now()) # current time
 
-CONFIG_FILE_PATH = "/Users/liyuwen/Desktop/pyspider/config_file/mcd8_dictionary.json"
-HEADERS_FILE_PATH = "/Users/liyuwen/Desktop/test_file/ws_header.json"
-COOKIES_FILE_PATH = "/Users/liyuwen/Desktop/test_file/pharmnet_cookies.json"
+CONFIG_FILE_PATH = "/data/apps/crawler/envi-pyspider/config_file/mcd8_dictionary.json"
+HEADERS_FILE_PATH = "/data/apps/crawler/envi-pyspider/config_file/ws_header.json"
+COOKIES_FILE_PATH = "/data/apps/crawler/envi-pyspider/config_file/cookies.json"
 
 
 class Handler(BaseHandler):
@@ -88,7 +89,6 @@ class Handler(BaseHandler):
             file_path = os.path.join(dir_path, fullname)
             f = open(file_path, "w+")
             print('Successfully open')
-            # f.write(content.encode('utf-8'))
             f.write(content)
             f.close()
             print('Save html')
@@ -152,7 +152,14 @@ class Handler(BaseHandler):
             db.rollback()
             print('Something wrong')
             return 0
-
+    
+    def checkurl(self, url):
+        try:
+            page = urllib.request.urlopen(url)
+            return 1
+        except:
+            return 0
+        
     @every(minutes=24 * 60)
     def on_start(self):
         site_url = self.base_url
@@ -187,16 +194,30 @@ class Handler(BaseHandler):
             detail_page_value = soup.find_all(self.detail_text_content['content_css'],
                                               class_ = self.detail_text_content['content_css_class'][1])[index].text
             detail_id = self.save_details(wsid, qid, detail_page_name, detail_page_value, 0)  
-            #print(soup.find_all('div', class_ = 'dict')[index].text)
-            #print(soup.find_all('div', class_ = 'content')[index].text)
         
-        if up == 1:            
-            self.crawl(response.doc(self.detail_paging_css['up']).attr.href,callback=self.index_page,
-                        save={'wsid': wsid, 'qid': qid,'up' : 1, 'down' : 0}, 
-                        fetch_type=self.fetch_method, allow_redirects=False)
+            
+        if up == 1:
+            x = 5
+            while x > 0:
+                up_css = 'li:nth-of-type(' + str(x) + ') a'
+                if self.checkurl(response.doc(up_css).attr.href) == 1:
+                    self.crawl(response.doc(up_css).attr.href, callback=self.index_page,
+                                save={'wsid': wsid, 'qid': qid,'up' : 1, 'down' : 0}, 
+                                fetch_type=self.fetch_method, allow_redirects=False)
+                    break
+                else: 
+                    x -= 1
             
         if down == 1:
-            self.crawl(response.doc(self.detail_paging_css['down']).attr.href,callback=self.index_page,
-                        save={'wsid': wsid, 'qid': qid,'up' : 0, 'down' : 1}, 
-                        fetch_type=self.fetch_method, allow_redirects=False)
+            y = 7          
+            while y < 12:
+                down_css = 'li:nth-of-type(' + str(y) + ') a'  
+                if self.checkurl(response.doc(down_css).attr.href) == 1:
+                    self.crawl(response.doc(down_css).attr.href,callback=self.index_page,
+                                save={'wsid': wsid, 'qid': qid,'up' : 0, 'down' : 1}, 
+                                fetch_type=self.fetch_method, allow_redirects=False)
+                    break
+                else: 
+                    y += 1
+
 

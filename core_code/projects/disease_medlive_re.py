@@ -14,9 +14,9 @@ import itertools
 
 ## str(datetime.datetime.now()) # current time
 
-CONFIG_FILE_PATH = "/Users/JasonZhang1/Desktop/Test_Web/disease_medlive_test.json"
-HEADERS_FILE_PATH = "/Users/JasonZhang1/Desktop/Test_Web/ws_header.json"
-COOKIES_FILE_PATH = "/Users/JasonZhang1/Desktop/Test_Web/pharmnet_cookies.json"
+CONFIG_FILE_PATH = "/data/apps/crawler/envi-pyspider/config_file/disease_medlive.json"
+HEADERS_FILE_PATH = "/data/apps/crawler/envi-pyspider/config_file/ws_header.json"
+COOKIES_FILE_PATH = "/data/apps/crawler/envi-pyspider/config_file/cookies.json"
 
 
 class Handler(BaseHandler):
@@ -476,5 +476,6 @@ class Handler(BaseHandler):
                         continue
                     else:
                         detail_id = self.save_details(wsid, qid, item_name, item_value, 0)
+
 
 
