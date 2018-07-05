@@ -9,7 +9,7 @@
 "page_table":"webpages",
 "site_table":"websites",
 "detail_table":"webpages_details",
-"DIR_PATH":"/home/crawler/result/data",
+"DIR_PATH":"/data/apps/crawler/result/data",
 "CONTENT_FILES_WS_PREFIX":"ws_",
 "CONTENT_FILES_WP_PREFIX":"wp_",
 "CONTENT_FILES_EXT":".html",

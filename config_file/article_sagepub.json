@@ -1,0 +1,91 @@
+{
+"START_URL":"http://journals.sagepub.com/articles/sco",
+"BE_A_GOOD_CRAWLER":0,
+"host":"172.31.7.85",
+"user":"crawler",
+"passwd":"password",
+"db":"crawler",
+"charset":"utf8",
+"page_table":"webpages",
+"site_table":"websites",
+"detail_table":"webpages_details",
+"temp_table":"temporary_data",
+"DIR_PATH":"/data/apps/crawler/result/data",
+"CONTENT_FILES_WS_PREFIX":"ws_",
+"CONTENT_FILES_WP_PREFIX":"wp_",
+"CONTENT_FILES_EXT":".html",
+"fetch_method" : "js",
+"max_plv":2,
+"total_css":
+[
+	{ 
+		"method":"GET",
+		"method_data":[],
+		"link":
+		[
+			".art_title .nowrap"
+		], 
+		"paging":".nextPage", 
+		"paging_text":"",
+		"text":"", 
+		"image":"",
+		"lv_key_tag_css":[],
+		"lv_key_tag_value":[]
+	}
+],
+"single_detail_data_type" :"No",
+"detail_page_title":
+{
+	"name": "title_of_webpage",
+	"title_css":"h1"
+},
+"detail_paging_css": "",
+"detail_paging_text": "",
+"detail_text_content":[],
+"tables_css":[],
+"json_tables_css":[],
+"detail_multi_pairs_css":
+[
+	{
+		"content_css":".hlFld-Fulltext .NLM_sec",
+		"name_css":".sectionInfo .sectionHeading",
+		"value_css":"p"
+	}
+
+],
+"detail_pairs_css":
+[
+	{
+		"name_css": "",
+		"name":"Author",
+		"value_css": ".authorList",
+		"alternative_value_css": ""
+	},
+	{
+		"name_css":"",
+		"name":"Journal",
+		"value_css":".recommendCitationJournalTitle"
+	},
+	{
+		"name_css":"",
+		"name":"DOI",
+		"value_css":".doiWidgetLink"
+	},
+	{
+		"name_css":".abstractSectionHeading > .sectionHeading",
+		"value_css":".abstractSection.abstractInFull",
+		"keep_format":"True"
+	},
+	{
+		"name_css":".abstractKeywords > .hlFld-KeywordText > b",
+		"value_css":".hlFld-KeywordText .attributes"
+	},
+	{
+		"name_css":"",
+		"name":"Reference",
+		"value_css":".references",
+		"keep_format":"True"
+	}
+]
+
+}

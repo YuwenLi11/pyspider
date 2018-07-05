@@ -1,7 +1,7 @@
 {
-"START_URL":"http://disease.medlive.cn/wiki/list/171",
+"START_URL":"https://www.patientslikeme.com/treatments/browse",
 "BE_A_GOOD_CRAWLER":0,
-"host":"localhost",
+"host":"172.31.7.85",
 "user":"crawler",
 "passwd":"password",
 "db":"crawler",
@@ -9,12 +9,13 @@
 "page_table":"webpages",
 "site_table":"websites",
 "detail_table":"webpages_details",
+"temp_table":"temporary_data",
 "DIR_PATH":"/data/apps/crawler/result/data",
 "CONTENT_FILES_WS_PREFIX":"ws_",
 "CONTENT_FILES_WP_PREFIX":"wp_",
 "CONTENT_FILES_EXT":".html",
 "fetch_method" : "js",
-"max_plv":5,
+"max_plv":2,
 "total_css":
 [
 	{ 
@@ -22,10 +23,10 @@
 		"method_data":[],
 		"link":
 		[
-			".sortCont a"
+			"td > a"
 		], 
-		"paging":"", 
-		"paging_text":"",
+		"paging":".next_page", 
+		"paging_text":"Next page",
 		"text":"", 
 		"image":"",
 		"lv_key_tag_css":[],
@@ -36,7 +37,7 @@
 		"method_data":[],
 		"link":
 		[
-			"dd > a"
+			".section-panel > .show > a"
 		], 
 		"paging":"", 
 		"paging_text":"",
@@ -80,45 +81,50 @@
 		"lv_key_tag_value":[]
 	}
 ],
-"single_detail_data_type" :"Yes",
+"single_detail_data_type" :"No",
 "detail_page_title":
 {
-	"name": "网页标题",
-	"title_css":".main > .part h3 > span"
+	"name": "title_of_webpage",
+	"title_css":"h1 > span"
 },
 "detail_paging_css": "",
 "detail_paging_text": "",
-"detail_text_content":
+"detail_text_content":[],
+"tables_css":[],
+"json_tables_css":
 [
 	{
-		"content_css":".skin_knw .bd",
-		"content_title_tag":
-		[
-			"strong",
-			"h3"
-		]
-	}
-],
-"tables_css":
-[
-	{
-		"table_css":"div.content > table", 
+		"table_css":".section-panel > .row > div", 
 		"rows_css":"tr", 
 		"columns_css":"td", 
-		"max_item_number":10
+		"title_css":[".tertiary-title",".tbl-divided > caption"]
+	},
+	{
+		"table_css":".data-panel > .row > div", 
+		"rows_css":"tr", 
+		"columns_css":"td", 
+		"title_css":[".tertiary-title",".tbl-divided > caption","h2","p > strong"]
 	}
 ],
-"json_tables_css":[],
 "detail_pairs_css":
 [
 	{
-		"name_css": ".skin_knw h3 > span",
-		"value_css": ".editor_mirror_del"
+		"name_css": "#summary > h2",
+		"value_css": "[itemprop='description']",
+		"alternative_value_css": ".medium-15 > p:nth-of-type(3)"
 	},
 	{
-		"name_css":".hd2 > h3",
-		"value_css":".bd2 > div.bd2_cont"
-	}
+		"name_css":".margin-vertical-none > strong",
+		"value_css":".margin-vertical-none > a"
+	},
+	{
+		"name_css":".toggle > strong",
+		"value_css":".toggle > .comma-separated > a"
+	},
+	{
+		"name_css":"p > em",
+		"value_css":".toggle > .comma-separated > a"
+	}	
 ]
 
 }

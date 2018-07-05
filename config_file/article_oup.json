@@ -1,0 +1,79 @@
+{
+"START_URL":"https://academic.oup.com/omcr/search-results?page=1&f_TocHeadingTitle=Case+reports&fl_SiteID=5128&tax=omcrep%2f0#",
+"BE_A_GOOD_CRAWLER":0,
+"host":"localhost",
+"user":"crawler",
+"passwd":"password",
+"db":"crawler",
+"charset":"utf8",
+"page_table":"webpages",
+"site_table":"websites",
+"detail_table":"webpages_details",
+"temp_table":"temporary_data",
+"DIR_PATH":"/data/apps/crawler/result/data",
+"CONTENT_FILES_WS_PREFIX":"ws_",
+"CONTENT_FILES_WP_PREFIX":"wp_",
+"CONTENT_FILES_EXT":".html",
+"fetch_method" : "js",
+"max_plv":2,
+"total_css":
+[
+	{ 
+		"method":"GET",
+		"method_data":[],
+		"link":
+		[
+			".article-link"
+		], 
+		"paging":".al-nav-next.sr-nav-next", 
+		"paging_text":"",
+		"text":"", 
+		"image":"",
+		"lv_key_tag_css":[],
+		"lv_key_tag_value":[]
+	}
+],
+"single_detail_data_type" :"No",
+"detail_page_title":
+{
+	"name": "title_of_webpage",
+	"title_css":".article-title-main"
+},
+"detail_paging_css": "",
+"detail_paging_text": "",
+"detail_text_content":[],
+"tables_css":[],
+"json_tables_css":[],
+"detail_multi_pairs_css":[],
+"detail_pairs_css":
+[
+	{
+		"name_css": "",
+		"name":"Author",
+		"value_css": ".linked-name",
+		"alternative_value_css": ""
+	},
+	{
+		"name_css":"",
+		"name":"Journal",
+		"value_css":".ww-citation-primary > em"
+	},
+	{
+		"name_css":"",
+		"name":"DOI",
+		"value_css":".ww-citation-primary > a"
+	},
+	{
+		"name_css":".article-metadata-taxonomies-title",
+		"value_css":".article-metadata a"
+	},
+	{
+		"name_css":"",
+		"name":"Full_text",
+		"value_css":".widget-instance-OUP_Article_FullText_Widget > div > div",
+		"keep_format":"True"
+	}
+	
+]
+
+}

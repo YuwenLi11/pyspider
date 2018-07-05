@@ -1,0 +1,127 @@
+{
+"START_URL":"https://jmedicalcasereports.biomedcentral.com/articles",
+"BE_A_GOOD_CRAWLER":0,
+"host":"172.31.7.85",
+"user":"crawler",
+"passwd":"password",
+"db":"crawler",
+"charset":"utf8",
+"page_table":"webpages",
+"site_table":"websites",
+"detail_table":"webpages_details",
+"temp_table":"temporary_data",
+"DIR_PATH":"/data/apps/crawler/result/data",
+"CONTENT_FILES_WS_PREFIX":"ws_",
+"CONTENT_FILES_WP_PREFIX":"wp_",
+"CONTENT_FILES_EXT":".html",
+"fetch_method" : "js",
+"max_plv":2,
+"total_css":
+[
+	{ 
+		"method":"GET",
+		"method_data":[],
+		"link":
+		[
+			"[itemprop='name'] > a"
+		], 
+		"paging":".c-search-navbar__pagination-link--next", 
+		"paging_text":"",
+		"text":"", 
+		"image":"",
+		"lv_key_tag_css":[],
+		"lv_key_tag_value":[]
+	}
+],
+"single_detail_data_type" :"No",
+"detail_page_title":
+{
+	"name": "title_of_webpage",
+	"title_css":".MainTitleSection > h1"
+},
+"detail_paging_css": "",
+"detail_paging_text": "",
+"detail_text_content":[],
+"tables_css":[],
+"json_tables_css":[],
+"detail_pairs_css":
+[
+	{
+		"name_css": "",
+		"name":"Author",
+		"value_css": ".AuthorName",
+		"alternative_value_css": ""
+	},
+	{
+		"name_css":"",
+		"name":"Journal",
+		"value_css":".JournalTitle"
+	},
+	{
+		"name_css":"",
+		"name":"DOI",
+		"value_css":".ArticleDOI > a"
+	},
+	{
+		"name_css":".Abstract > .js-ToggleCollapseSection",
+		"value_css":".AbstractSection",
+		"keep_format":"True"
+	},
+	{
+		"name_css":".KeywordGroup > .js-ToggleCollapseSection",
+		"value_css":".KeywordGroup > .CollapseSection",
+		"keep_format":"True"
+	},
+	{
+		"name_css":"#Sec1 > .js-ToggleCollapseSection",
+		"value_css":"#Sec1 .Para",
+		"keep_format":"True"
+	},
+	{
+		"name_css":"#Sec2 > .js-ToggleCollapseSection",
+		"value_css":"#Sec2 .Para",
+		"keep_format":"True"
+	},
+	{
+		"name_css":"#Sec3 > .js-ToggleCollapseSection",
+		"value_css":"#Sec3 .Para",
+		"keep_format":"True"
+	},
+	{
+		"name_css":"#Sec4 > .js-ToggleCollapseSection",
+		"value_css":"#Sec4 .Para",
+		"keep_format":"True"
+	},
+	{
+		"name_css":"#Sec5 > .js-ToggleCollapseSection",
+		"value_css":"#Sec4 .Para",
+		"keep_format":"True"
+	},
+	{
+		"name_css":"#Sec6 > .js-ToggleCollapseSection",
+		"value_css":"#Sec4 .Para",
+		"keep_format":"True"
+	},
+	{
+		"name_css":"#Declarations > .js-ToggleCollapseSection",
+		"value_css":"#Declarations > .CollapseSection",
+		"keep_format":"True"
+	},
+	{
+		"name_css":".Affiliations > .js-ToggleCollapseSection",
+		"value_css":".Affiliation",
+		"keep_format":"True"
+	},
+	{
+		"name_css":".SectionTypeMaterialsAndMethods > .js-ToggleCollapseSection",
+		"value_css":".CollapseSection > ol",
+		"keep_format":"True"
+	},
+	{
+		"name_css":"#CopyrightMessage > .js-ToggleCollapseSection",
+		"value_css":"#CopyrightMessage > .CollapseSection > div",
+		"keep_format":"True"
+	}	
+]
+
+}
